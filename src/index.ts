@@ -4,6 +4,7 @@ import { createServer } from 'http';
 import setCurrentUser from './middleware/set-current-user';
 import authController from './modules/auth/auth.controller';
 import settingController from './modules/settings/setting.controller';
+import taskController from './modules/tasks/task.controller';
 import datasource from './datasource';
 
 require('dotenv').config();
@@ -24,6 +25,7 @@ app.use('/uploads', express.static('uploads'));
 // ルートの設定
 app.use('/auth', authController);
 app.use('/settings', settingController);
+app.use('/tasks', taskController);
 
 app.get('/', (req: Request, res: Response) => {
   res.send('hello world');
