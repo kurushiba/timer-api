@@ -3,6 +3,7 @@ import cors from 'cors';
 import { createServer } from 'http';
 import setCurrentUser from './middleware/set-current-user';
 import authController from './modules/auth/auth.controller';
+import settingController from './modules/settings/setting.controller';
 import datasource from './datasource';
 
 require('dotenv').config();
@@ -22,6 +23,7 @@ app.use('/uploads', express.static('uploads'));
 
 // ルートの設定
 app.use('/auth', authController);
+app.use('/settings', settingController);
 
 app.get('/', (req: Request, res: Response) => {
   res.send('hello world');
