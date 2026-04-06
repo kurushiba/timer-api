@@ -5,6 +5,7 @@ import setCurrentUser from './middleware/set-current-user';
 import authController from './modules/auth/auth.controller';
 import settingController from './modules/settings/setting.controller';
 import taskController from './modules/tasks/task.controller';
+import sessionController from './modules/sessions/session.controller';
 import datasource from './datasource';
 
 require('dotenv').config();
@@ -26,6 +27,7 @@ app.use('/uploads', express.static('uploads'));
 app.use('/auth', authController);
 app.use('/settings', settingController);
 app.use('/tasks', taskController);
+app.use('/sessions', sessionController);
 
 app.get('/', (req: Request, res: Response) => {
   res.send('hello world');
