@@ -6,12 +6,12 @@ import { Auth } from '../../lib/auth';
 const router = Router();
 const taskRepository = datasource.getRepository(Task);
 
-// GET /tasks — タスク一覧（order昇順）
+// GET /tasks — タスク一覧
 router.get('/', Auth, async (req: Request, res: Response) => {
   try {
     const tasks = await taskRepository.find({
       where: { userId: req.currentUser.id },
-      order: { order: 'ASC' },
+      order: { createdAt: 'ASC' },
     });
     res.json(tasks);
   } catch (error) {
@@ -34,36 +34,6 @@ router.post('/', Auth, async (req: Request, res: Response) => {
       userId: req.currentUser.id,
     });
     res.status(201).json(task);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// PATCH /tasks/reorder — 並び順一括更新（:idより先に定義）
-router.patch('/reorder', Auth, async (req: Request, res: Response) => {
-  try {
-    const { orderedIds } = req.body;
-    if (!Array.isArray(orderedIds)) {
-      res.status(400).json({ message: 'orderedIds is required' });
-      return;
-    }
-
-    const cases = orderedIds
-      .map((id: string, i: number) => `WHEN '${id}' THEN ${i}`)
-      .join(' ');
-
-    await taskRepository
-      .createQueryBuilder()
-      .update(Task)
-      .set({ order: () => `CASE "id" ${cases} END` })
-      .where('"id" IN (:...ids) AND "userId" = :userId', {
-        ids: orderedIds,
-        userId: req.currentUser.id,
-      })
-      .execute();
-
-    res.json({ message: 'Reordered' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });

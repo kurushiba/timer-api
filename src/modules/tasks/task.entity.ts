@@ -19,9 +19,6 @@ export class Task {
   @Column({ default: false })
   completed: boolean;
 
-  @Column({ default: 0 })
-  order: number;
-
   @ManyToOne(() => User)
   user: User;
 

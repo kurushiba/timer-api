@@ -10,7 +10,8 @@
     "typeorm": "typeorm-ts-node-commonjs",
     "migration:generate": "npm run typeorm -- migration:generate -d src/datasource.ts",
     "migration:run": "npm run typeorm -- migration:run -d src/datasource.ts",
-    "migration:revert": "npm run typeorm -- migration:revert -d src/datasource.ts"
+    "migration:revert": "npm run typeorm -- migration:revert -d src/datasource.ts",
+    "generate:seed": "ts-node -r tsconfig-paths/register --transpile-only src/scripts/generate-seed.ts"
   },
   "keywords": [
     "express",

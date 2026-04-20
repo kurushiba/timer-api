@@ -7,6 +7,13 @@ import { Auth } from '../../lib/auth';
 const router = Router();
 const sessionRepository = datasource.getRepository(FocusSession);
 
+function toLocalDateStr(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 // GET /sessions/weekly — 今週（月〜日）の曜日別集中時間
 router.get('/weekly', Auth, async (req: Request, res: Response) => {
   try {
@@ -36,10 +43,10 @@ router.get('/weekly', Auth, async (req: Request, res: Response) => {
     for (let i = 0; i < 7; i++) {
       const date = new Date(weekStart);
       date.setDate(weekStart.getDate() + i);
-      const dateStr = date.toISOString().split('T')[0];
+      const dateStr = toLocalDateStr(date);
 
       const totalSeconds = sessions
-        .filter((s) => new Date(s.startedAt).toISOString().split('T')[0] === dateStr)
+        .filter((s) => toLocalDateStr(new Date(s.startedAt)) === dateStr)
         .reduce((sum, s) => sum + s.duration, 0);
 
       daily.push({
@@ -50,8 +57,8 @@ router.get('/weekly', Auth, async (req: Request, res: Response) => {
     }
 
     res.json({
-      weekStart: weekStart.toISOString().split('T')[0],
-      weekEnd: weekEnd.toISOString().split('T')[0],
+      weekStart: toLocalDateStr(weekStart),
+      weekEnd: toLocalDateStr(weekEnd),
       daily,
     });
   } catch (error) {
@@ -83,10 +90,10 @@ router.get('/heatmap', Auth, async (req: Request, res: Response) => {
     for (let i = 0; i < 90; i++) {
       const date = new Date(start);
       date.setDate(start.getDate() + i);
-      const dateStr = date.toISOString().split('T')[0];
+      const dateStr = toLocalDateStr(date);
 
       const totalSeconds = sessions
-        .filter((s) => new Date(s.startedAt).toISOString().split('T')[0] === dateStr)
+        .filter((s) => toLocalDateStr(new Date(s.startedAt)) === dateStr)
         .reduce((sum, s) => sum + s.duration, 0);
 
       result.push({ date: dateStr, totalSeconds });
@@ -129,7 +136,7 @@ router.get('/by-task', Auth, async (req: Request, res: Response) => {
 // GET /sessions — 指定日のセッション一覧
 router.get('/', Auth, async (req: Request, res: Response) => {
   try {
-    const dateStr = (req.query.date as string) || new Date().toISOString().split('T')[0];
+    const dateStr = (req.query.date as string) || toLocalDateStr(new Date());
     const dayStart = new Date(`${dateStr}T00:00:00`);
     const dayEnd = new Date(`${dateStr}T23:59:59.999`);
 
@@ -163,8 +170,8 @@ router.post('/', Auth, async (req: Request, res: Response) => {
       type,
       duration,
       interrupted: interrupted ?? false,
-      startedAt,
-      endedAt: endedAt ?? null,
+      startedAt: new Date(startedAt),
+      endedAt: endedAt ? new Date(endedAt) : undefined,
       taskId: taskId ?? null,
       userId: req.currentUser.id,
     });
