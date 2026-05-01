@@ -125,7 +125,7 @@ router.get('/by-task', Auth, async (req: Request, res: Response) => {
         taskId: r.taskId,
         taskTitle: r.taskTitle,
         totalSeconds: Number(r.totalSeconds),
-      }))
+      })),
     );
   } catch (error) {
     console.error(error);
@@ -159,10 +159,13 @@ router.get('/', Auth, async (req: Request, res: Response) => {
 // POST /sessions — セッション記録
 router.post('/', Auth, async (req: Request, res: Response) => {
   try {
-    const { type, duration, interrupted, startedAt, endedAt, taskId } = req.body;
+    const { type, duration, interrupted, startedAt, endedAt, taskId } =
+      req.body;
 
     if (!type || duration === undefined || !startedAt) {
-      res.status(400).json({ message: 'type, duration, startedAt are required' });
+      res
+        .status(400)
+        .json({ message: 'type, duration, startedAt are required' });
       return;
     }
 
@@ -176,7 +179,12 @@ router.post('/', Auth, async (req: Request, res: Response) => {
       userId: req.currentUser.id,
     });
 
-    res.status(201).json(session);
+    const sessionWithTask = await sessionRepository.findOne({
+      where: { id: session.id },
+      relations: ['task'],
+    });
+
+    res.status(201).json(sessionWithTask);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
