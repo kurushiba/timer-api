@@ -26,8 +26,8 @@ router.get('/', Auth, async (req: Request, res: Response) => {
   }
 });
 
-// PUT /settings — ユーザー設定更新
-router.put('/', Auth, async (req: Request, res: Response) => {
+// PATCH /settings — ユーザー設定更新
+router.patch('/', Auth, async (req: Request, res: Response) => {
   try {
     const {
       focusDuration,
@@ -50,9 +50,11 @@ router.put('/', Auth, async (req: Request, res: Response) => {
     }
 
     setting.focusDuration = focusDuration ?? setting.focusDuration;
-    setting.shortBreakDuration = shortBreakDuration ?? setting.shortBreakDuration;
+    setting.shortBreakDuration =
+      shortBreakDuration ?? setting.shortBreakDuration;
     setting.longBreakDuration = longBreakDuration ?? setting.longBreakDuration;
-    setting.sessionsBeforeLongBreak = sessionsBeforeLongBreak ?? setting.sessionsBeforeLongBreak;
+    setting.sessionsBeforeLongBreak =
+      sessionsBeforeLongBreak ?? setting.sessionsBeforeLongBreak;
     setting.autoStartNext = autoStartNext ?? setting.autoStartNext;
     setting.soundEnabled = soundEnabled ?? setting.soundEnabled;
     setting.soundType = soundType ?? setting.soundType;
