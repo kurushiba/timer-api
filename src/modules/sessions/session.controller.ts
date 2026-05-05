@@ -109,6 +109,18 @@ router.get('/heatmap', Auth, async (req: Request, res: Response) => {
 // GET /sessions/by-task — タスク別集中時間集計
 router.get('/by-task', Auth, async (req: Request, res: Response) => {
   try {
+    const now = new Date();
+    const dayOfWeek = now.getDay();
+    const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - diffToMonday);
+    weekStart.setHours(0, 0, 0, 0);
+
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    weekEnd.setHours(23, 59, 59, 999);
+
     const rows = await sessionRepository
       .createQueryBuilder('s')
       .select('s.taskId', 'taskId')
@@ -117,6 +129,10 @@ router.get('/by-task', Auth, async (req: Request, res: Response) => {
       .innerJoin('s.task', 't')
       .where('s.userId = :userId', { userId: req.currentUser.id })
       .andWhere('s.type = :type', { type: 'focus' })
+      .andWhere('s.startedAt BETWEEN :start AND :end', {
+        start: weekStart,
+        end: weekEnd,
+      })
       .groupBy('s.taskId')
       .getRawMany();
 
